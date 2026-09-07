@@ -23,17 +23,28 @@ internal class Program
             autoDelete: false,
             arguments: null);
 
-        string message = "Hello RabbitMQ";
 
-        var body = Encoding.UTF8.GetBytes(message);
+        var random = new Random();
+        int messageId = 1;
 
-        await channel.BasicPublishAsync(
-            exchange: "",
-            routingKey: "hello",
-            mandatory: false,
-            basicProperties: new BasicProperties(),
-            body: body);
+        while (true)
+        {
+            var publishiingDelay = random.Next(1, 3);
 
-        Console.WriteLine("Message Sent");
+            string message = $"Message {messageId}";
+
+            var body = Encoding.UTF8.GetBytes(message);
+
+            await channel.BasicPublishAsync(
+                exchange: "",
+                routingKey: "hello",
+                mandatory: false,
+                basicProperties: new BasicProperties(),
+                body: body);
+
+            Console.WriteLine($"Message Sent: {message}");
+            messageId++;
+            await Task.Delay(TimeSpan.FromSeconds(publishiingDelay));
+        }
     }
 }
