@@ -50,13 +50,13 @@ internal class Program
         //    await Task.Delay(TimeSpan.FromSeconds(publishiingDelay));
         //}
 
-        string message = $"Message For Payments Consumer";
+        string message = $"Message For both Analytics and Payments Consumers";
 
         var body = Encoding.UTF8.GetBytes(message);
 
         await channel.BasicPublishAsync(
             exchange: "myRoutingExchange",
-            routingKey: "paymentsKey",
+            routingKey: "both",
             mandatory: false,
             basicProperties: new BasicProperties(),
             body: body);

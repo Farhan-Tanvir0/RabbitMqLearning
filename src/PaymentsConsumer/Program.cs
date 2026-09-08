@@ -31,6 +31,11 @@ internal class Program
             exchange: "myRoutingExchange",
             routingKey: "paymentsKey");
 
+        await channel.QueueBindAsync(
+            queue: tempQueue.QueueName,
+            exchange: "myRoutingExchange",
+            routingKey: "both");
+
         var consumer = new AsyncEventingBasicConsumer(channel);
 
         consumer.ReceivedAsync += async (model, ea) =>
