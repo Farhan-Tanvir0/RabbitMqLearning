@@ -16,7 +16,8 @@ internal class Program
 
         using var channel = await connection.CreateChannelAsync();
 
-        await channel.ExchangeDeclareAsync(exchange: "PubSub", type: ExchangeType.Fanout, durable: true, autoDelete: false);
+        //await channel.ExchangeDeclareAsync(exchange: "PubSub", type: ExchangeType.Fanout, durable: true, autoDelete: false);
+        await channel.ExchangeDeclareAsync(exchange: "myRoutingExchange", type: ExchangeType.Direct, durable: true, autoDelete: false);
 
         //await channel.QueueDeclareAsync(
         //    queue: "hello",
@@ -49,13 +50,13 @@ internal class Program
         //    await Task.Delay(TimeSpan.FromSeconds(publishiingDelay));
         //}
 
-        string message = $"Message For All Interested Parties";
+        string message = $"Message For Payments Consumer";
 
         var body = Encoding.UTF8.GetBytes(message);
 
         await channel.BasicPublishAsync(
-            exchange: "PubSub",
-            routingKey: "",
+            exchange: "myRoutingExchange",
+            routingKey: "paymentsKey",
             mandatory: false,
             basicProperties: new BasicProperties(),
             body: body);
