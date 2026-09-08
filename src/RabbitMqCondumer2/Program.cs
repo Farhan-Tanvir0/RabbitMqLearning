@@ -1,4 +1,12 @@
-﻿using RabbitMQ.Client;
+﻿
+//This Client is Desined to understant Computing Consumer Pattern,
+//where the messages are distributed among the consumers,
+//and each consumer will process one message at a time.
+//This is achieved by setting the prefetch count to 1,
+//which means that the consumer will only receive one message at a time,
+//and it will not receive another message until it has acknowledged the previous one.
+
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 internal class Program

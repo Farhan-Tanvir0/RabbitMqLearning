@@ -1,4 +1,8 @@
-﻿using RabbitMQ.Client;
+﻿
+//This client is designed for a pub/sub scenario,
+//where multiple consumers can receive the same message.
+
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 internal class Program
@@ -15,12 +19,21 @@ internal class Program
         await using var connection = await factory.CreateConnectionAsync();
         await using var channel = await connection.CreateChannelAsync();
 
-        await channel.QueueDeclareAsync(
-            queue: "hello",
-            durable: true,
-            exclusive: false,
-            autoDelete: false,
+        //this line is omnipotent, it will create the exchange if it doesn't exist, or do nothing if it does.
+        await channel.ExchangeDeclareAsync(exchange: "PubSub", type: ExchangeType.Fanout, durable: true, autoDelete: false);
+
+        //this is a temporary queue that will be deleted when the consumer disconnects
+        var tempQueue = await channel.QueueDeclareAsync(
+            queue: "",
+            durable: false,
+            exclusive: true,
+            autoDelete: true,
             arguments: null);
+        
+        await channel.QueueBindAsync(
+            queue: tempQueue.QueueName,
+            exchange: "PubSub",
+            routingKey: "");
 
         var consumer = new AsyncEventingBasicConsumer(channel);
 
@@ -33,8 +46,8 @@ internal class Program
         };
 
         await channel.BasicConsumeAsync(
-            queue: "hello",
-            autoAck: false,
+            queue: tempQueue.QueueName,
+            autoAck: true,
             consumer: consumer);
 
         Console.WriteLine("Waiting for messages...");

@@ -16,35 +16,50 @@ internal class Program
 
         using var channel = await connection.CreateChannelAsync();
 
-        await channel.QueueDeclareAsync(
-            queue: "hello",
-            durable: true,
-            exclusive: false,
-            autoDelete: false,
-            arguments: null);
+        await channel.ExchangeDeclareAsync(exchange: "PubSub", type: ExchangeType.Fanout, durable: true, autoDelete: false);
+
+        //await channel.QueueDeclareAsync(
+        //    queue: "hello",
+        //    durable: true,
+        //    exclusive: false,
+        //    autoDelete: false,
+        //    arguments: null);
 
 
-        var random = new Random();
-        int messageId = 1;
+        //var random = new Random();
+        //int messageId = 1;
 
-        while (true)
-        {
-            var publishiingDelay = random.Next(1, 3);
+        //while (true)
+        //{
+        //    var publishiingDelay = random.Next(1, 3);
 
-            string message = $"Message {messageId}";
+        //    string message = $"Message {messageId}";
 
-            var body = Encoding.UTF8.GetBytes(message);
+        //    var body = Encoding.UTF8.GetBytes(message);
 
-            await channel.BasicPublishAsync(
-                exchange: "",
-                routingKey: "hello",
-                mandatory: false,
-                basicProperties: new BasicProperties(),
-                body: body);
+        //    await channel.BasicPublishAsync(
+        //        exchange: "",
+        //        routingKey: "hello",
+        //        mandatory: false,
+        //        basicProperties: new BasicProperties(),
+        //        body: body);
 
-            Console.WriteLine($"Message Sent: {message}");
-            messageId++;
-            await Task.Delay(TimeSpan.FromSeconds(publishiingDelay));
-        }
+        //    Console.WriteLine($"Message Sent: {message}");
+        //    messageId++;
+        //    await Task.Delay(TimeSpan.FromSeconds(publishiingDelay));
+        //}
+
+        string message = $"Message For All Interested Parties";
+
+        var body = Encoding.UTF8.GetBytes(message);
+
+        await channel.BasicPublishAsync(
+            exchange: "PubSub",
+            routingKey: "",
+            mandatory: false,
+            basicProperties: new BasicProperties(),
+            body: body);
+
+        Console.WriteLine($"Message Sent: {message}");
     }
 }
