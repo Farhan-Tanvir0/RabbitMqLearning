@@ -5,7 +5,7 @@ internal class Program
 {
     public static async Task Main(string[] args)
     {
-        Console.WriteLine("RabbitMQ Payments Consumer");
+        Console.WriteLine("RabbitMQ User Consumer");
 
         var factory = new ConnectionFactory
         {
@@ -29,7 +29,7 @@ internal class Program
         await channel.QueueBindAsync(
             queue: tempQueue.QueueName,
             exchange: "myTopicExchange",
-            routingKey: "#.payments");
+            routingKey: "user.#");
 
         var consumer = new AsyncEventingBasicConsumer(channel);
 
@@ -37,7 +37,7 @@ internal class Program
         {
             var body = ea.Body.ToArray();
             var message = System.Text.Encoding.UTF8.GetString(body);
-            Console.WriteLine($"Received by Payments Consumer: {message}");
+            Console.WriteLine($"Received by User Consumer: {message}");
             await Task.CompletedTask;
         };
 

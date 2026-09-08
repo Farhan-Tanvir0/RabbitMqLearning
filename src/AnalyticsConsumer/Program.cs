@@ -16,7 +16,7 @@ internal class Program
         await using var channel = await connection.CreateChannelAsync();
 
         //this line is omnipotent, it will create the exchange if it doesn't exist, or do nothing if it does.
-        await channel.ExchangeDeclareAsync(exchange: "myRoutingExchange", type: ExchangeType.Direct, durable: true, autoDelete: false);
+        await channel.ExchangeDeclareAsync(exchange: "myTopicExchange", type: ExchangeType.Topic, durable: true, autoDelete: false);
 
         //this is a temporary queue that will be deleted when the consumer disconnects
         var tempQueue = await channel.QueueDeclareAsync(
@@ -28,13 +28,8 @@ internal class Program
 
         await channel.QueueBindAsync(
             queue: tempQueue.QueueName,
-            exchange: "myRoutingExchange",
-            routingKey: "analyticsKey");
-
-        await channel.QueueBindAsync(
-            queue: tempQueue.QueueName,
-            exchange: "myRoutingExchange",
-            routingKey: "both");
+            exchange: "myTopicExchange",
+            routingKey: "*.Bangladesh.*");
 
         var consumer = new AsyncEventingBasicConsumer(channel);
 

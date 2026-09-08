@@ -17,7 +17,8 @@ internal class Program
         using var channel = await connection.CreateChannelAsync();
 
         //await channel.ExchangeDeclareAsync(exchange: "PubSub", type: ExchangeType.Fanout, durable: true, autoDelete: false);
-        await channel.ExchangeDeclareAsync(exchange: "myRoutingExchange", type: ExchangeType.Direct, durable: true, autoDelete: false);
+        //await channel.ExchangeDeclareAsync(exchange: "myRoutingExchange", type: ExchangeType.Direct, durable: true, autoDelete: false);
+        await channel.ExchangeDeclareAsync(exchange: "myTopicExchange", type: ExchangeType.Topic, durable: true, autoDelete: false);
 
         //await channel.QueueDeclareAsync(
         //    queue: "hello",
@@ -50,17 +51,30 @@ internal class Program
         //    await Task.Delay(TimeSpan.FromSeconds(publishiingDelay));
         //}
 
-        string message = $"Message For both Analytics and Payments Consumers";
+        string message = $"Message For  Analytics , User and Payments Consumers";
 
         var body = Encoding.UTF8.GetBytes(message);
 
         await channel.BasicPublishAsync(
-            exchange: "myRoutingExchange",
-            routingKey: "both",
+            exchange: "myTopicExchange",
+            routingKey: "user.Bangladesh.payments",
             mandatory: false,
             basicProperties: new BasicProperties(),
             body: body);
 
+
+        string message2 = $"Message For  only Analytics Consumer";
+
+        var body2 = Encoding.UTF8.GetBytes(message2);
+
+        await channel.BasicPublishAsync(
+            exchange: "myTopicExchange",
+            routingKey: "Data.Bangladesh.analytics",
+            mandatory: false,
+            basicProperties: new BasicProperties(),
+            body: body2);
+
         Console.WriteLine($"Message Sent: {message}");
+        Console.WriteLine($"Message Sent: {message2}");
     }
 }
